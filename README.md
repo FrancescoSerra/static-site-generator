@@ -14,17 +14,19 @@ This is a simple static site generator written in Scala. It takes markdown files
 - Uses Either for error handling, carrying the result value on the right and the information about the error on the error channel
 - Uses newtypes for type safety
 
-## Markdown syntax supported
-- H1: `#`
-- H2: `##`
-- H3: `###`
-- Bold: `**bold text**`
-- Italic: `*italic text*`
-- Links: `[link text](url)`
-- Underlined: `__underlined text__`
-- Paragraphs: separated by blank lines
-- Unordered lists: `- item`
-- Ordered lists: `1. item`
+## Markdown syntax supported and relative HTML output 
+| Text property   | Markdown Syntax          | HTML Output                   |
+|-----------------|--------------------------|-------------------------------|
+| H1              | `#`                      | `<h1>header</h1>`             |
+| H2              | `##`                     | `<h2>header</h2>`             |
+| H3              | `###`                    | `<h3>header</h3>`             |
+| Bold            | `**bold text**`          | `<strong>bold text</strong>`  |
+| Italic          | `*italic text*`          | `<em>italic text</em>`        |
+| Links           | `[link text](url)`       | `<a href="url">link text</a>` |
+| Underlined      | `__underlined text__`     | `<u>underlined text</u>`      |
+| Paragraphs      | separated by blank lines | `<p>paragraph text</p>`       |
+| Unordered lists | `- item`                 | `<ul><li>item</li></ul>`      | 
+| Ordered lists   |  `1. item`               | `<ol><li>item</li></ol>`      | 
 
 
 ### Future stretch goals
