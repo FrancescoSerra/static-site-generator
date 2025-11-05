@@ -19,18 +19,17 @@ object model {
 
   // naive weak and brittle smart constructor
   def mkNode(value: NonEmptyString, typ: String): AST = typ match {
-    case "h1" => H1(value)
-    case "h2" => H2(value)
-    case "h3" => H3(value)
+    case "h1"     => H1(value)
+    case "h2"     => H2(value)
+    case "h3"     => H3(value)
     case "strong" => Bold(value)
-    case "em" => Italic(value)
-    case "a" => Link(value)
-    case "u" => Underlined(value)
-    case "p" => Paragraph(value)
-    case "ul-li" => UnorderedListItem(value)
-    case "ol-li" => OrderedListItem(value)
+    case "em"     => Italic(value)
+    case "a"      => Link(value)
+    case "u"      => Underlined(value)
+    case "p"      => Paragraph(value)
+    case "ul-li"  => UnorderedListItem(value)
+    case "ol-li"  => OrderedListItem(value)
   }
-
 
   // HTML definitions
   sealed trait HTML {
@@ -69,16 +68,16 @@ object model {
 
   // naive, weak and brittle smart constructor
   def mkHtml(value: NonEmptyString, typ: String): HTML = typ match {
-    case "h1" => H1Html(value)
-    case "h2" => H2Html(value)
-    case "h3" => H3Html(value)
+    case "h1"     => H1Html(value)
+    case "h2"     => H2Html(value)
+    case "h3"     => H3Html(value)
     case "strong" => BoldHtml(value)
-    case "em" => ItalicHtml(value)
-    case "a" => LinkHtml(value)
-    case "u" => UnderlinedHtml(value)
-    case "p" => ParagraphHtml(value)
-    case "ul-li" => UnorderedListItemHtml(value)
-    case "ol-li" => OrderedListItemHtml(value)
+    case "em"     => ItalicHtml(value)
+    case "a"      => LinkHtml(value)
+    case "u"      => UnderlinedHtml(value)
+    case "p"      => ParagraphHtml(value)
+    case "ul-li"  => UnorderedListItemHtml(value)
+    case "ol-li"  => OrderedListItemHtml(value)
   }
 
 }
