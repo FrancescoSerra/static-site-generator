@@ -13,13 +13,19 @@ object StaticSiteGenerator {
 
   private val notEol: Parsley[List[Char]] = many(satisfy(_ != '\n'))
   private val h1parser: Parsley[H1] =
-    (char('#') ~> ws ~> notEol <~ newline).map(chars => H1(NonEmptyString.unsafeFrom(chars.mkString)))
+    (char('#') ~> ws ~> notEol <~ newline).map(chars =>
+      H1(NonEmptyString.unsafeFrom(chars.mkString))
+    )
   private val notSquareBracket: Parsley[List[Char]] = many(satisfy(_ != ']'))
   private val notRoundBracket: Parsley[List[Char]] = many(satisfy(_ != ')'))
-  private val linkTextParser: Parsley[String] = (char('[') ~> notSquareBracket <~ char(']')).map(_.mkString)
-  private val linkUrlParser: Parsley[String] = (char('(') ~> notRoundBracket <~ char(')')).map(_.mkString)
+  private val linkTextParser: Parsley[String] =
+    (char('[') ~> notSquareBracket <~ char(']')).map(_.mkString)
+  private val linkUrlParser: Parsley[String] =
+    (char('(') ~> notRoundBracket <~ char(')')).map(_.mkString)
   private val linkParser: Parsley[Link] = (linkTextParser <~> linkUrlParser)
-    .map { case (text, url) => Link(text = NonEmptyString.unsafeFrom(text), url = NonEmptyString.unsafeFrom(url))}
+    .map { case (text, url) =>
+      Link(text = NonEmptyString.unsafeFrom(text), url = NonEmptyString.unsafeFrom(url))
+    }
   private val parser: Parsley[AST] = h1parser <|> linkParser
 
 //  private val parser: Parsley[AST] = for {
@@ -35,14 +41,14 @@ object StaticSiteGenerator {
 
   def generateHtml(tree: AST): HTML = tree match {
     case H1(title)                => H1Html(title)
-    case H2(value)                => ??? //mkHtml(value, "h2")
-    case H3(value)                => ??? //mkHtml(value, "h3")
-    case Bold(value)              => ??? //mkHtml(value, "strong")
-    case Italic(value)            => ??? //mkHtml(value, "em")
+    case H2(value)                => ??? // mkHtml(value, "h2")
+    case H3(value)                => ??? // mkHtml(value, "h3")
+    case Bold(value)              => ??? // mkHtml(value, "strong")
+    case Italic(value)            => ??? // mkHtml(value, "em")
     case Link(text, url)          => LinkHtml(text = text, url = url)
-    case Underlined(value)        => ??? //mkHtml(value, "u")
-    case Paragraph(value)         => ??? //mkHtml(value, "p")
-    case UnorderedListItem(value) => ??? //mkHtml(value, "ul-li")
-    case OrderedListItem(value)   => ??? //mkHtml(value, "ol-li")
+    case Underlined(value)        => ??? // mkHtml(value, "u")
+    case Paragraph(value)         => ??? // mkHtml(value, "p")
+    case UnorderedListItem(value) => ??? // mkHtml(value, "ul-li")
+    case OrderedListItem(value)   => ??? // mkHtml(value, "ol-li")
   }
 }
