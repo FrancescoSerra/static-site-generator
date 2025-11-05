@@ -11,4 +11,13 @@ class StaticSiteGeneratorSuite extends CatsEffectSuite {
       Right("<h1>A title</h1>")
     )
   }
+
+  test("H2 test"){
+    assertsEquals(
+      parse("## A subtitle\n").map(generateHtml).map(_.render),
+      Right("<h2>A subtitle</h2>")
+    )
+  }
+  
+
 }

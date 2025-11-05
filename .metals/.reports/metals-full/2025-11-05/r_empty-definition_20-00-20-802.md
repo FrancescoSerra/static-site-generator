@@ -1,3 +1,31 @@
+error id: file://<WORKSPACE>/src/main/scala/org/scalabridge/sitegen/StaticSiteGenerator.scala:`<none>`.
+file://<WORKSPACE>/src/main/scala/org/scalabridge/sitegen/StaticSiteGenerator.scala
+empty definition using pc, found symbol in pc: `<none>`.
+empty definition using semanticdb
+empty definition using fallback
+non-local guesses:
+	 -cats/syntax/all/in.
+	 -cats/syntax/all/in#
+	 -cats/syntax/all/in().
+	 -org/scalabridge/in.
+	 -org/scalabridge/in#
+	 -org/scalabridge/in().
+	 -domain/model/in.
+	 -domain/model/in#
+	 -domain/model/in().
+	 -parsley/in.
+	 -parsley/in#
+	 -parsley/in().
+	 -in.
+	 -in#
+	 -in().
+	 -scala/Predef.in.
+	 -scala/Predef.in#
+	 -scala/Predef.in().
+offset: 399
+uri: file://<WORKSPACE>/src/main/scala/org/scalabridge/sitegen/StaticSiteGenerator.scala
+text:
+```scala
 package org.scalabridge.sitegen
 
 import cats.syntax.all._
@@ -11,8 +39,8 @@ import parsley.character.{char, newline, satisfy, space}
 object StaticSiteGenerator {
   private val ws: Parsley[Unit] = Parsley.many(space).void
 
-  private val h1parser: Parsley[AST] = for {
-    in <- (char('#') ~> ws ~> many(satisfy(_ != '\n')) <~ newline)
+  private val parser: Parsley[AST] = for {
+    i@@n <- (char('#') ~> ws ~> many(satisfy(_ != '\n')) <~ newline)
     value <- NonEmptyString.from(in.mkString) match {
               case Right(v) => Parsley.pure(v)
               case _ => Parsley.empty
@@ -21,27 +49,8 @@ object StaticSiteGenerator {
 
     //...
 
-  private val h2parser: Parsley[AST] = for{
-    in <- (char('#') ~> char('#') ~> ws ~> many(satisfy(_ != '\n')) <~ newline)
-    value <- NonEmptyString.from(in.mkString) match {
-              case Right(v) => Parsley.pure(v)
-              case _ => Parsley.empty
-            }
-  } yield mkNode(value, "h2")
-
-
-  // private val h3parser: Parsley[AST] = for {
-  //   in <- (char('#') ~> char('#') ~> char('#') ~> ws ~> many(satisfy(_ != '\n')) <~ newline)
-  //   value <- NonEmptyString.from(in.mkString) match {
-  //             case Right(v) => Parsley.pure(v)
-  //             case _ => Parsley.empty
-  //           }
-  // } yield mkNode(value, "h3")
-
-  private val parser: Parsley[AST] = h2Parser <|> h1Parser
-
   def parse(markdown: String): Either[Error, AST] =
-    parser.parser(markdown).toEither.leftMap(Error.apply)
+    parser.parse(markdown).toEither.leftMap(Error.apply)
 
   def generateHtml(tree: AST): HTML = tree match {
     case H1(title) => mkHtml(title, "h1")
@@ -56,3 +65,10 @@ object StaticSiteGenerator {
     case OrderedListItem(value) => mkHtml(value, "ol-li")
   }
 }
+
+```
+
+
+#### Short summary: 
+
+empty definition using pc, found symbol in pc: `<none>`.

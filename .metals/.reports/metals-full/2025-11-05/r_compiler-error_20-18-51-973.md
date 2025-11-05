@@ -1,3 +1,16 @@
+file://<WORKSPACE>/src/main/scala/org/scalabridge/sitegen/StaticSiteGenerator.scala
+### java.lang.IndexOutOfBoundsException: -1
+
+occurred in the presentation compiler.
+
+presentation compiler configuration:
+
+
+action parameters:
+offset: 701
+uri: file://<WORKSPACE>/src/main/scala/org/scalabridge/sitegen/StaticSiteGenerator.scala
+text:
+```scala
 package org.scalabridge.sitegen
 
 import cats.syntax.all._
@@ -21,27 +34,10 @@ object StaticSiteGenerator {
 
     //...
 
-  private val h2parser: Parsley[AST] = for{
-    in <- (char('#') ~> char('#') ~> ws ~> many(satisfy(_ != '\n')) <~ newline)
-    value <- NonEmptyString.from(in.mkString) match {
-              case Right(v) => Parsley.pure(v)
-              case _ => Parsley.empty
-            }
-  } yield mkNode(value, "h2")
-
-
-  // private val h3parser: Parsley[AST] = for {
-  //   in <- (char('#') ~> char('#') ~> char('#') ~> ws ~> many(satisfy(_ != '\n')) <~ newline)
-  //   value <- NonEmptyString.from(in.mkString) match {
-  //             case Right(v) => Parsley.pure(v)
-  //             case _ => Parsley.empty
-  //           }
-  // } yield mkNode(value, "h3")
-
-  private val parser: Parsley[AST] = h2Parser <|> h1Parser
+  private val h2Parser: Parsley[AST] = for{@@}
 
   def parse(markdown: String): Either[Error, AST] =
-    parser.parser(markdown).toEither.leftMap(Error.apply)
+    parser.parse(markdown).toEither.leftMap(Error.apply)
 
   def generateHtml(tree: AST): HTML = tree match {
     case H1(title) => mkHtml(title, "h1")
@@ -56,3 +52,23 @@ object StaticSiteGenerator {
     case OrderedListItem(value) => mkHtml(value, "ol-li")
   }
 }
+
+```
+
+
+
+#### Error stacktrace:
+
+```
+scala.collection.LinearSeqOps.apply(LinearSeq.scala:129)
+	scala.collection.LinearSeqOps.apply$(LinearSeq.scala:128)
+	scala.collection.immutable.List.apply(List.scala:79)
+	dotty.tools.dotc.util.Signatures$.applyCallInfo(Signatures.scala:244)
+	dotty.tools.dotc.util.Signatures$.computeSignatureHelp(Signatures.scala:101)
+	dotty.tools.dotc.util.Signatures$.signatureHelp(Signatures.scala:88)
+	dotty.tools.pc.SignatureHelpProvider$.signatureHelp(SignatureHelpProvider.scala:46)
+	dotty.tools.pc.ScalaPresentationCompiler.signatureHelp$$anonfun$1(ScalaPresentationCompiler.scala:435)
+```
+#### Short summary: 
+
+java.lang.IndexOutOfBoundsException: -1
