@@ -1,9 +1,11 @@
 package org.scalabridge.sitegen
 
 import munit.ScalaCheckSuite
-import org.scalabridge.sitegen.StaticSiteGenerator.{generateHtml, h1Parser, parse, underLinedParser}
+import org.scalabridge.sitegen.StaticSiteGenerator.*
+import org.scalabridge.sitegen.domain.model.AST
 import org.scalabridge.sitegen.generators.misc.nonEmptyStringGen
 import org.scalacheck.Prop.forAll
+import parsley.Parsley
 
 class StaticSiteGeneratorSuite extends ScalaCheckSuite {
 
@@ -23,5 +25,13 @@ class StaticSiteGeneratorSuite extends ScalaCheckSuite {
         Right(s"<u>$nes</u>")
       )
     }
+  }
+
+
+  test("Bold test") {
+    assertEquals(
+      parse("**bold text**", strongParser).map(generateHtml).map(_.render),
+      Right("<strong>bold text</strong>")
+    )
   }
 }
