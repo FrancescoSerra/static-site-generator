@@ -14,7 +14,7 @@ class StaticSiteGeneratorSuite extends CatsEffectSuite {
 
   test("Link test") {
     assertEquals(
-      parse("[An example link](http://www.example.com)\n").map(generateHtml).map(_.render),
+      parse("[An example link](http://www.example.com)").map(generateHtml).map(_.render),
       Right("""<a href="http://www.example.com">An example link</a>""")
     )
   }
