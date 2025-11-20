@@ -9,6 +9,8 @@ ThisBuild / tpolecatDefaultOptionsMode := VerboseMode
 
 lazy val catsEffectV = "3.6.3"
 lazy val ironV = "3.2.1"
+lazy val MunitCatsEffectScalaCheck = "1.0.4"
+lazy val Munit = "1.2.0"
 
 lazy val root = (project in file(".")).settings(
   name := "static-site-generator",
@@ -27,9 +29,10 @@ lazy val root = (project in file(".")).settings(
 
     // for better enumeration
     "com.beachape" %% "enumeratum" % "1.9.0",
-
-    // better monadic for compiler plugin as suggested by documentation
     "com.github.j-mie6" %% "parsley" % "4.6.1",
-    "org.typelevel" %% "munit-cats-effect" % "2.0.0" % Test
+    "org.scalameta" %% "munit" % Munit,
+    "org.scalameta" %% "munit-scalacheck" % Munit,
+    "org.typelevel" %% "munit-cats-effect" % "2.1.0" % Test,
+    "org.typelevel" %% "scalacheck-effect-munit" % MunitCatsEffectScalaCheck % Test
   )
 )

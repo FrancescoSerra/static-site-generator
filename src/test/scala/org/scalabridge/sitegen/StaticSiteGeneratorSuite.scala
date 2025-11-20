@@ -1,28 +1,27 @@
 package org.scalabridge.sitegen
 
-import munit.CatsEffectSuite
+import munit.ScalaCheckSuite
 import org.scalabridge.sitegen.StaticSiteGenerator.{generateHtml, h1Parser, parse, underLinedParser}
+import org.scalabridge.sitegen.generators.misc.nonEmptyStringGen
+import org.scalacheck.Prop.forAll
 
-class StaticSiteGeneratorSuite extends CatsEffectSuite {
+class StaticSiteGeneratorSuite extends ScalaCheckSuite {
 
   test("H1 test") {
-    assertEquals(
-      parse("# A title\n", h1Parser).map(generateHtml).map(_.render),
-      Right("<h1>A title</h1>")
-    )
+    forAll(nonEmptyStringGen) { nes =>
+      assertEquals(
+        parse(s"#$nes\n", h1Parser).map(generateHtml).map(_.render),
+        Right(s"<h1>$nes</h1>")
+      )
+    }
   }
 
-  test("Underlined test1") {
-    assertEquals(
-      parse("__title__\n", underLinedParser).map(generateHtml).map(_.render),
-      Right("<u>title</u>")
-    )
-  }
-
-  test("Underlined test2") {
-    assertEquals(
-      parse("__a title__\n", underLinedParser).map(generateHtml).map(_.render),
-      Right("<u>a title</u>")
-    )
+  test("Underlined test") {
+    forAll(nonEmptyStringGen) { nes =>
+      assertEquals(
+        parse(s"__${nes}__\n", underLinedParser).map(generateHtml).map(_.render),
+        Right(s"<u>$nes</u>")
+      )
+    }
   }
 }
