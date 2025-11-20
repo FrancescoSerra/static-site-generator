@@ -15,7 +15,7 @@ object StaticSiteGenerator {
   val h1Parser: Parsley[H1] = for {
     in <- char('#') ~> ws ~> many(satisfy(_ != '\n')) <~ newline
     value <- in.mkString.refineEither[NonEmptyString] match {
-      case Left(value) => Parsley.empty
+      case Left(value)  => Parsley.empty
       case Right(value) => Parsley.pure(value)
     }
   } yield H1(value)
@@ -23,7 +23,7 @@ object StaticSiteGenerator {
   val underLinedParser: Parsley[Underlined] = for {
     in <- string("__") ~> manyTill(item, string("__")) <~ newline
     value <- in.mkString.refineEither[NonEmptyString] match {
-      case Left(value) => Parsley.empty
+      case Left(value)  => Parsley.empty
       case Right(value) => Parsley.pure(value)
     }
   } yield Underlined(value)
