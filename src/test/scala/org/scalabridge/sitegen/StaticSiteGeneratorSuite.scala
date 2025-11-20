@@ -1,7 +1,7 @@
 package org.scalabridge.sitegen
 
 import munit.CatsEffectSuite
-import org.scalabridge.sitegen.StaticSiteGenerator.{generateHtml, h1Parser, parse, underLinedParser}
+import org.scalabridge.sitegen.StaticSiteGenerator.{generateHtml, h1Parser, linkParser, parse, parseMany, underLinedParser}
 
 class StaticSiteGeneratorSuite extends CatsEffectSuite {
 
@@ -28,7 +28,7 @@ class StaticSiteGeneratorSuite extends CatsEffectSuite {
 
   test("Link test") {
     assertEquals(
-      parse("[An example link](http://www.example.com)").map(generateHtml).map(_.render),
+      parse("[An example link](http://www.example.com)", linkParser).map(generateHtml).map(_.render),
       Right("""<a href="http://www.example.com">An example link</a>""")
     )
   }
@@ -37,7 +37,7 @@ class StaticSiteGeneratorSuite extends CatsEffectSuite {
     assertEquals(
       parseMany(
         """# A title
-          |Refer [an example link](http://www.example.com).
+          |Some __underlined text__. Refer [an example link](http://www.example.com).
           |
           |More text.
           |
@@ -46,7 +46,7 @@ class StaticSiteGeneratorSuite extends CatsEffectSuite {
       ).map(trees => generateHtml(trees).map(_.render)),
       Right(List(
         "<h1>A title</h1>",
-        """<p>Refer <a href="http://www.example.com">an example link</a>.</p>""",
+        """Some <u>underlined text</u>. <p>Refer <a href="http://www.example.com">an example link</a>.</p>""",
         "<p>More text.</p>",
         "<h1>Another title</h1>",
         "<p>Another text.</p>",

@@ -66,18 +66,18 @@ object model {
     override def render: String = s"<ol><li>$value</li></ol>"
   }
 
-  // naive, weak and brittle smart constructor
-//  def mkHtml(value: NonEmptyString, typ: String): HTML = typ match {
-//    case "h1"     => H1Html(value)
-//    case "h2"     => H2Html(value)
-//    case "h3"     => H3Html(value)
-//    case "strong" => BoldHtml(value)
-//    case "em"     => ItalicHtml(value)
-//    case "a"      => LinkHtml(value)
-//    case "u"      => UnderlinedHtml(value)
-//    case "p"      => ParagraphHtml(value)
-//    case "ul-li"  => UnorderedListItemHtml(value)
-//    case "ol-li"  => OrderedListItemHtml(value)
-//  }
+//   naive, weak and brittle smart constructor
+  def mkHtml(value: NonEmptyString, typ: String): HTML = typ match {
+    case "h1"     => H1Html(value)
+    case "h2"     => H2Html(value)
+    case "h3"     => H3Html(value)
+    case "strong" => BoldHtml(value)
+    case "em"     => ItalicHtml(value)
+    case "a"      => ??? // LinkHtml(value)
+    case "u"      => UnderlinedHtml(value)
+    case "p"      => ParagraphHtml(value)
+    case "ul-li"  => UnorderedListItemHtml(value)
+    case "ol-li"  => OrderedListItemHtml(value)
+  }
 
 }
