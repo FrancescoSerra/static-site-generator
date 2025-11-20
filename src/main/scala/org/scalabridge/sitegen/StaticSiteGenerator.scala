@@ -28,6 +28,24 @@ object StaticSiteGenerator {
     }
   } yield Underlined(value)
 
+  private val notSquareBracket: Parsley[List[Char]] = many(satisfy(_ != ']'))
+  private val notRoundBracket: Parsley[List[Char]] = many(satisfy(_ != ')'))
+  private val linkTextParser: Parsley[String] =
+    (char('[') ~> notSquareBracket <~ char(']')).map(_.mkString)
+  private val linkUrlParser: Parsley[String] =
+    (char('(') ~> notRoundBracket <~ char(')')).map(_.mkString)
+  val linkParser: Parsley[Link] = for {
+    (text, url) <- linkTextParser <~> linkUrlParser
+    textValue <- NonEmptyString.from(text.mkString) match {
+      case Right(v) => Parsley.pure(v)
+      case _        => Parsley.empty
+    }
+    urlValue <- NonEmptyString.from(url.mkString) match {
+      case Right(v) => Parsley.pure(v)
+      case _        => Parsley.empty
+    }
+  } yield Link(text = textValue, url = urlValue)
+
   def parse(markdown: String, parsleyInstance: Parsley[AST]): Either[Error, AST] =
     parsleyInstance.parse(markdown).toEither.leftMap(Error.apply)
 
@@ -37,7 +55,7 @@ object StaticSiteGenerator {
     case H3(value)                => mkHtml(value, "h3")
     case Bold(value)              => mkHtml(value, "strong")
     case Italic(value)            => mkHtml(value, "em")
-    case Link(value)              => mkHtml(value, "a")
+    case Link(text, url)          => LinkHtml(text = text, url = url)
     case Underlined(value)        => mkHtml(value, "u")
     case Paragraph(value)         => mkHtml(value, "p")
     case UnorderedListItem(value) => mkHtml(value, "ul-li")

@@ -1,5 +1,7 @@
 import org.typelevel.sbt.tpolecat.*
 
+Global / onChangedBuildSource := ReloadOnSourceChanges
+
 ThisBuild / organization := "org.scalabridge"
 ThisBuild / scalaVersion := "3.7.0"
 
