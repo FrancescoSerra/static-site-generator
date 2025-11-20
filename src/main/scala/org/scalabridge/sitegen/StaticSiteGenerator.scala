@@ -1,21 +1,33 @@
 package org.scalabridge.sitegen
 
 import cats.syntax.all._
-import org.scalabridge._
-import domain.model._
 import eu.timepit.refined.types.string.NonEmptyString
-import parsley._
+import org.scalabridge._
+import org.scalabridge.sitegen.domain.model._
 import parsley.Parsley.{atomic, many}
-import parsley.character.{char, newline, satisfy, space}
+import parsley._
+import parsley.character._
+import parsley.combinator.manyTill
 
 object StaticSiteGenerator {
   private val ws: Parsley[Unit] = Parsley.many(space).void
 
-  private val notEol: Parsley[List[Char]] = many(satisfy(_ != '\n'))
-  private val h1parser: Parsley[H1] =
-    (char('#') ~> ws ~> notEol <~ newline).map(chars =>
-      H1(NonEmptyString.unsafeFrom(chars.mkString))
-    )
+  val h1Parser: Parsley[H1] = for {
+    in <- char('#') ~> ws ~> many(satisfy(_ != '\n')) <~ newline
+    value <- NonEmptyString.from(in.mkString) match {
+      case Right(v) => Parsley.pure(v)
+      case _        => Parsley.empty
+    }
+  } yield H1(value)
+
+  val underLinedParser: Parsley[Underlined] = for {
+    in <- string("__") ~> manyTill(item, string("__")) <~ newline
+    value <- NonEmptyString.from(in.mkString) match {
+      case Right(v) => Parsley.pure(v)
+      case _        => Parsley.empty
+    }
+  } yield Underlined(value)
+
   private val notSquareBracket: Parsley[List[Char]] = many(satisfy(_ != ']'))
   private val notRoundBracket: Parsley[List[Char]] = many(satisfy(_ != ')'))
   private val linkTextParser: Parsley[String] =
@@ -26,35 +38,30 @@ object StaticSiteGenerator {
     .map { case (text, url) =>
       Link(text = NonEmptyString.unsafeFrom(text), url = NonEmptyString.unsafeFrom(url))
     }
-  private val parser: Parsley[AST] = atomic(h1parser) <|> linkParser
-  private val manyParser: Parsley[List[AST]] = many(parser)
 
-//  private val parser: Parsley[AST] = for {
-//    ast <- astParser
-//    value <- NonEmptyString.from(in.mkString) match {
-//      case Right(v) => Parsley.pure(v)
-//      case _        => Parsley.empty
-//    }
-//  } yield mkNode(value, "h1")
+//  private val parser: Parsley[AST] = atomic(h1Parser) <|> linkParser
+//  private val manyParser: Parsley[List[AST]] = many(parser)
 
-  def parse(markdown: String): Either[Error, AST] =
-    parser.parse(markdown).toEither.leftMap(Error.apply)
 
-  def parseMany(markdown: String): Either[Error, List[AST]] =
-    manyParser.parse(markdown).toEither.leftMap(Error.apply)
+  def parse(markdown: String, parsleyInstance: Parsley[AST]): Either[Error, AST] =
+    parsleyInstance.parse(markdown).toEither.leftMap(Error.apply)
+
+//  def parseMany(markdown: String): Either[Error, List[AST]] =
+//    manyParser.parse(markdown).toEither.leftMap(Error.apply)
 
   def generateHtml(tree: AST): HTML = tree match {
-    case H1(title)                => H1Html(title)
-    case H2(value)                => ??? // mkHtml(value, "h2")
-    case H3(value)                => ??? // mkHtml(value, "h3")
-    case Bold(value)              => ??? // mkHtml(value, "strong")
-    case Italic(value)            => ??? // mkHtml(value, "em")
-    case Link(text, url)          => LinkHtml(text = text, url = url)
-    case Underlined(value)        => ??? // mkHtml(value, "u")
-    case Paragraph(value)         => ??? // mkHtml(value, "p")
-    case UnorderedListItem(value) => ??? // mkHtml(value, "ul-li")
-    case OrderedListItem(value)   => ??? // mkHtml(value, "ol-li")
+    case H1(title)                => mkHtml(title, "h1")
+    case H2(value)                => mkHtml(value, "h2")
+    case H3(value)                => mkHtml(value, "h3")
+    case Bold(value)              => mkHtml(value, "strong")
+    case Italic(value)            => mkHtml(value, "em")
+    case Link(value)              => mkHtml(value, "a")
+//    case Link(text, url)          => LinkHtml(text = text, url = url)
+    case Underlined(value)        => mkHtml(value, "u")
+    case Paragraph(value)         => mkHtml(value, "p")
+    case UnorderedListItem(value) => mkHtml(value, "ul-li")
+    case OrderedListItem(value)   => mkHtml(value, "ol-li")
   }
 
-  def generateHtml(trees: List[AST]): List[HTML] = trees.map(generateHtml)
+//  def generateHtml(trees: List[AST]): List[HTML] = trees.map(generateHtml)
 }
