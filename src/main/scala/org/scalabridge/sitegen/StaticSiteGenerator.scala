@@ -5,7 +5,7 @@ import org.scalabridge._
 import domain.model._
 import eu.timepit.refined.types.string.NonEmptyString
 import parsley._
-import parsley.Parsley.many
+import parsley.Parsley.{atomic, many}
 import parsley.character.{char, newline, satisfy, space}
 
 object StaticSiteGenerator {
@@ -26,7 +26,8 @@ object StaticSiteGenerator {
     .map { case (text, url) =>
       Link(text = NonEmptyString.unsafeFrom(text), url = NonEmptyString.unsafeFrom(url))
     }
-  private val parser: Parsley[AST] = h1parser <|> linkParser
+  private val parser: Parsley[AST] = atomic(h1parser) <|> linkParser
+  private val manyParser: Parsley[List[AST]] = many(parser)
 
 //  private val parser: Parsley[AST] = for {
 //    ast <- astParser
@@ -38,6 +39,9 @@ object StaticSiteGenerator {
 
   def parse(markdown: String): Either[Error, AST] =
     parser.parse(markdown).toEither.leftMap(Error.apply)
+
+  def parseMany(markdown: String): Either[Error, List[AST]] =
+    manyParser.parse(markdown).toEither.leftMap(Error.apply)
 
   def generateHtml(tree: AST): HTML = tree match {
     case H1(title)                => H1Html(title)
@@ -51,4 +55,6 @@ object StaticSiteGenerator {
     case UnorderedListItem(value) => ??? // mkHtml(value, "ul-li")
     case OrderedListItem(value)   => ??? // mkHtml(value, "ol-li")
   }
+
+  def generateHtml(trees: List[AST]): List[HTML] = trees.map(generateHtml)
 }

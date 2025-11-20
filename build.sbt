@@ -30,7 +30,8 @@ lazy val root = (project in file(".")).settings(
     // better monadic for compiler plugin as suggested by documentation
     compilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1"),
     "com.github.j-mie6" %% "parsley" % "4.6.1",
-    "org.typelevel" %% "munit-cats-effect" % "2.0.0" % Test
+    "com.github.j-mie6" %% "parsley-cats" % "1.5.0",
+    "org.typelevel" %% "munit-cats-effect" % "2.1.0" % Test,
   ),
   scalacOptions += "-Ymacro-annotations"
 )
