@@ -1,7 +1,13 @@
 package org.scalabridge.sitegen
 
 import munit.ScalaCheckSuite
-import org.scalabridge.sitegen.StaticSiteGenerator.{generateHtml, h1Parser, linkParser, parse, underLinedParser}
+import org.scalabridge.sitegen.StaticSiteGenerator.{
+  generateHtml,
+  h1Parser,
+  linkParser,
+  parse,
+  underLinedParser
+}
 import org.scalabridge.sitegen.generators.misc.nonEmptyStringGen
 import org.scalacheck.Prop.forAll
 
@@ -27,7 +33,9 @@ class StaticSiteGeneratorSuite extends ScalaCheckSuite {
 
   test("Link") {
     assertEquals(
-      parse("[An example link](http://www.example.com)", linkParser).map(generateHtml).map(_.render),
+      parse("[An example link](http://www.example.com)", linkParser)
+        .map(generateHtml)
+        .map(_.render),
       Right("""<a href="http://www.example.com">An example link</a>""")
     )
   }
