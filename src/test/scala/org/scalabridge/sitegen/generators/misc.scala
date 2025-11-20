@@ -1,9 +1,10 @@
 package org.scalabridge.sitegen.generators
 
-import eu.timepit.refined.types.string.NonEmptyString
 import org.scalacheck.Gen
+import org.scalabridge.sitegen.domain.model.NonEmptyString
+import io.github.iltotore.iron.*
 
 object misc {
-  val nonEmptyStringGen: Gen[NonEmptyString] =
-    Gen.nonEmptyStringOf(Gen.alphaNumChar).map(NonEmptyString.unsafeFrom)
+  val nonEmptyStringGen: Gen[String :| NonEmptyString] =
+    Gen.nonEmptyStringOf(Gen.alphaNumChar).map(_.refineUnsafe)
 }
