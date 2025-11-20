@@ -25,7 +25,6 @@ lazy val root = (project in file(".")).settings(
 
     // for data semantics
     "io.github.iltotore" %% "iron" % ironV,
-    "eu.timepit" %% "refined" % "0.11.3",
 
     // for better enumeration
     "com.beachape" %% "enumeratum" % "1.9.0",

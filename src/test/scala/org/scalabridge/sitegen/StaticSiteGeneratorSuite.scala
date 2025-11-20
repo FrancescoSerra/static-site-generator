@@ -1,7 +1,7 @@
 package org.scalabridge.sitegen
 
-import munit.ScalaCheckSuite
 import org.scalabridge.sitegen.StaticSiteGenerator.{generateHtml, h1Parser, parse, underLinedParser}
+import munit.ScalaCheckSuite
 import org.scalabridge.sitegen.generators.misc.nonEmptyStringGen
 import org.scalacheck.Prop.forAll
 

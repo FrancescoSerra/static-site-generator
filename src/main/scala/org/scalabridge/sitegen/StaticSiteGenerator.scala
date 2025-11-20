@@ -1,30 +1,30 @@
 package org.scalabridge.sitegen
 
 import cats.syntax.all._
-import eu.timepit.refined.types.string.NonEmptyString
 import org.scalabridge._
-import org.scalabridge.sitegen.domain.model._
+import io.github.iltotore.iron.*
 import parsley.Parsley.many
 import parsley._
 import parsley.character._
 import parsley.combinator.manyTill
+import org.scalabridge.sitegen.domain.model.*
 
 object StaticSiteGenerator {
   private val ws: Parsley[Unit] = Parsley.many(space).void
 
   val h1Parser: Parsley[H1] = for {
     in <- char('#') ~> ws ~> many(satisfy(_ != '\n')) <~ newline
-    value <- NonEmptyString.from(in.mkString) match {
-      case Right(v) => Parsley.pure(v)
-      case _        => Parsley.empty
+    value <- in.mkString.refineEither[NonEmptyString] match {
+      case Left(value) => Parsley.empty
+      case Right(value) => Parsley.pure(value)
     }
   } yield H1(value)
 
   val underLinedParser: Parsley[Underlined] = for {
     in <- string("__") ~> manyTill(item, string("__")) <~ newline
-    value <- NonEmptyString.from(in.mkString) match {
-      case Right(v) => Parsley.pure(v)
-      case _        => Parsley.empty
+    value <- in.mkString.refineEither[NonEmptyString] match {
+      case Left(value) => Parsley.empty
+      case Right(value) => Parsley.pure(value)
     }
   } yield Underlined(value)
 
