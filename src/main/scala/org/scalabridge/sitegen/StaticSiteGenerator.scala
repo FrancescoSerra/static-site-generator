@@ -33,16 +33,15 @@ object StaticSiteGenerator {
   def rightToNode(tagName: String)(chars: Seq[Char]): AST = {
     val str = chars.mkString
     NonEmptyString.from(str) match {
-      case Right(v) =>  mkNode(v, tagName)
-      case _ => throw new Exception(s"Empty string in $tagName")
+      case Right(v) => mkNode(v, tagName)
+      case _        => throw new Exception(s"Empty string in $tagName")
     }
   }
 
-  private [sitegen] def between(s: String) = {
+  private[sitegen] def between(s: String) = {
     val border = string(s)
     border ~> manyTill(item, border)
   }
-
 
   def parse(markdown: String, parsleyInstance: Parsley[AST]): Either[Error, AST] =
     parsleyInstance.parse(markdown).toEither.leftMap(Error.apply)
