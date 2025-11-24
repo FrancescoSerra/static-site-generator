@@ -27,7 +27,6 @@ class StaticSiteGeneratorSuite extends ScalaCheckSuite {
     }
   }
 
-
   test("Bold test") {
     assertEquals(
       parse("**bold text**", strongParser).map(generateHtml).map(_.render),
