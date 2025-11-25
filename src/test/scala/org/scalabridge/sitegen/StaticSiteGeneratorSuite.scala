@@ -1,7 +1,8 @@
 package org.scalabridge.sitegen
 
 import munit.ScalaCheckSuite
-import org.scalabridge.sitegen.StaticSiteGenerator.{generateHtml, h1Parser, parse, underLinedParser}
+import org.scalabridge.sitegen.StaticSiteGenerator.*
+import org.scalabridge.sitegen.domain.model.AST
 import org.scalabridge.sitegen.generators.misc.nonEmptyStringGen
 import org.scalacheck.Prop.forAll
 
@@ -23,5 +24,24 @@ class StaticSiteGeneratorSuite extends ScalaCheckSuite {
         Right(s"<u>$nes</u>")
       )
     }
+  }
+
+  test("Bold test") {
+    forAll(nonEmptyStringGen) { nes =>
+      assertEquals(
+        parse(s"**$nes**", strongParser).map(generateHtml).map(_.render),
+        Right(s"<strong>$nes</strong>")
+      )
+    }
+  }
+  test("Bold failure test") {
+    assertEquals(
+      parse("*nes**", strongParser).map(generateHtml).map(_.render),
+      Left(org.scalabridge.Error("""(line 1, column 1):
+                                |  unexpected "*n"
+                                |  expected "**"
+                                |  >*nes**
+                                |   ^^""".stripMargin))
+    )
   }
 }

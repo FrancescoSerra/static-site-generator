@@ -28,6 +28,21 @@ object StaticSiteGenerator {
     }
   } yield Underlined(value)
 
+  val strongParser: Parsley[AST] = between("**") flatMap rightToNode("strong")
+
+  def rightToNode(tagName: String)(chars: Seq[Char]): Parsley[AST] = {
+    val str = chars.mkString
+    NonEmptyString.from(str) match {
+      case Right(v) => Parsley.pure(mkNode(v, tagName))
+      case _        => Parsley.empty
+    }
+  }
+
+  private[sitegen] def between(s: String) = {
+    val border = string(s)
+    border ~> manyTill(item, border)
+  }
+
   def parse(markdown: String, parsleyInstance: Parsley[AST]): Either[Error, AST] =
     parsleyInstance.parse(markdown).toEither.leftMap(Error.apply)
 
