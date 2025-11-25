@@ -8,6 +8,7 @@ import parsley.Parsley.many
 import parsley._
 import parsley.character._
 import parsley.combinator.manyTill
+import parsley.Parsley.atomic
 
 object StaticSiteGenerator {
   private val ws: Parsley[Unit] = Parsley.many(space).void
@@ -19,6 +20,19 @@ object StaticSiteGenerator {
       case _        => Parsley.empty
     }
   } yield H1(value)
+
+  val italicParser: Parsley[Italic] = {
+    def emphasis(ch: Char) = atomic(
+      char(ch) ~> many(noneOf('\n', ch)) <~ char(ch)
+    )
+    for {
+      in <- emphasis('*') <|> emphasis('_')
+      value <- NonEmptyString.from(in.mkString) match {
+        case Right(v) => Parsley.pure(v)
+        case _        => Parsley.empty
+      }
+    } yield Italic(value)
+  }
 
   val underLinedParser: Parsley[Underlined] = for {
     in <- string("__") ~> manyTill(item, string("__")) <~ newline
