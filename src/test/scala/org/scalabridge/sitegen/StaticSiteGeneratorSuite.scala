@@ -5,7 +5,6 @@ import org.scalabridge.sitegen.StaticSiteGenerator.*
 import org.scalabridge.sitegen.domain.model.AST
 import org.scalabridge.sitegen.generators.misc.nonEmptyStringGen
 import org.scalacheck.Prop.forAll
-import parsley.Parsley
 
 class StaticSiteGeneratorSuite extends ScalaCheckSuite {
 
@@ -28,9 +27,21 @@ class StaticSiteGeneratorSuite extends ScalaCheckSuite {
   }
 
   test("Bold test") {
+    forAll(nonEmptyStringGen) { nes =>
+      assertEquals(
+        parse(s"**$nes**", strongParser).map(generateHtml).map(_.render),
+        Right(s"<strong>$nes</strong>")
+      )
+    }
+  }
+  test("Bold failure test") {
     assertEquals(
-      parse("**bold text**", strongParser).map(generateHtml).map(_.render),
-      Right("<strong>bold text</strong>")
+      parse("*nes**", strongParser).map(generateHtml).map(_.render),
+      Left(org.scalabridge.Error("""(line 1, column 1):
+                                |  unexpected "*n"
+                                |  expected "**"
+                                |  >*nes**
+                                |   ^^""".stripMargin))
     )
   }
 }

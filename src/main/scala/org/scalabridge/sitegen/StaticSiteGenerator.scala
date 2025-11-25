@@ -28,13 +28,13 @@ object StaticSiteGenerator {
     }
   } yield Underlined(value)
 
-  val strongParser: Parsley[AST] = between("**") map rightToNode("strong")
+  val strongParser: Parsley[AST] = between("**") flatMap rightToNode("strong")
 
-  def rightToNode(tagName: String)(chars: Seq[Char]): AST = {
+  def rightToNode(tagName: String)(chars: Seq[Char]): Parsley[AST] = {
     val str = chars.mkString
     NonEmptyString.from(str) match {
-      case Right(v) => mkNode(v, tagName)
-      case _        => throw new Exception(s"Empty string in $tagName")
+      case Right(v) => Parsley.pure(mkNode(v, tagName))
+      case _        => Parsley.empty
     }
   }
 
