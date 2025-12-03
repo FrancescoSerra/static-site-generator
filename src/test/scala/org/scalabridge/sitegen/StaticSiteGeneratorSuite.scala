@@ -6,6 +6,7 @@ import org.scalabridge.sitegen.StaticSiteGenerator.{
   h1Parser,
   linkParser,
   parse,
+  parseMany,
   underLinedParser
 }
 import org.scalabridge.sitegen.generators.misc.nonEmptyStringGen
@@ -38,5 +39,26 @@ class StaticSiteGeneratorSuite extends ScalaCheckSuite {
         Right(s"""<a href="$urlNes">$textNes</a>""")
       )
     }
+  }
+
+  test("Integration test".ignore) {
+    assertEquals(
+      parseMany(
+        """# A title
+          |Some __underlined text__. Refer [an example link](http://www.example.com).
+          |
+          |More text.
+          |
+          |# Another title
+          |Another text""".stripMargin
+      ).map(trees => generateHtml(trees).map(_.render)),
+      Right(List(
+        "<h1>A title</h1>",
+        """Some <u>underlined text</u>. <p>Refer <a href="http://www.example.com">an example link</a>.</p>""",
+        "<p>More text.</p>",
+        "<h1>Another title</h1>",
+        "<p>Another text.</p>",
+      ))
+    )
   }
 }

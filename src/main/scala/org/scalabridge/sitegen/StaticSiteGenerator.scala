@@ -4,7 +4,7 @@ import cats.syntax.all._
 import eu.timepit.refined.types.string.NonEmptyString
 import org.scalabridge._
 import org.scalabridge.sitegen.domain.model._
-import parsley.Parsley.many
+import parsley.Parsley.{atomic, many}
 import parsley._
 import parsley.character._
 import parsley.combinator.manyTill
@@ -46,8 +46,14 @@ object StaticSiteGenerator {
     }
   } yield Link(text = textValue, url = urlValue)
 
+  private val astParser: Parsley[AST] = atomic(atomic(h1Parser) <|> underLinedParser) <|> linkParser
+  private val astListParser: Parsley[List[AST]] = many(astParser)
+
   def parse(markdown: String, parsleyInstance: Parsley[AST]): Either[Error, AST] =
     parsleyInstance.parse(markdown).toEither.leftMap(Error.apply)
+
+  def parseMany(markdown: String): Either[Error, List[AST]] =
+    astListParser.parse(markdown).toEither.leftMap(Error.apply)
 
   def generateHtml(tree: AST): HTML = tree match {
     case H1(title)                => mkHtml(title, "h1")
@@ -61,4 +67,6 @@ object StaticSiteGenerator {
     case UnorderedListItem(value) => mkHtml(value, "ul-li")
     case OrderedListItem(value)   => mkHtml(value, "ol-li")
   }
+
+  def generateHtml(trees: List[AST]): List[HTML] = trees.map(generateHtml)
 }
