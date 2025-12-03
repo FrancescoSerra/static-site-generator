@@ -55,7 +55,7 @@ class StaticSiteGeneratorSuite extends ScalaCheckSuite {
       Right(
         List(
           "<h1>A title</h1>",
-          """Some <u>underlined text</u>. <p>Refer <a href="http://www.example.com">an example link</a>.</p>""",
+          """<p>Some <u>underlined text</u>. Refer <a href="http://www.example.com">an example link</a>.</p>""",
           "<p>More text.</p>",
           "<h1>Another title</h1>",
           "<p>Another text.</p>"
