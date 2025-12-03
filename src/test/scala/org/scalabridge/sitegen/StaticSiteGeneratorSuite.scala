@@ -32,11 +32,11 @@ class StaticSiteGeneratorSuite extends ScalaCheckSuite {
   }
 
   test("Link") {
-    assertEquals(
-      parse("[An example link](http://www.example.com)", linkParser)
-        .map(generateHtml)
-        .map(_.render),
-      Right("""<a href="http://www.example.com">An example link</a>""")
-    )
+    forAll(nonEmptyStringGen, nonEmptyStringGen) { (textNes, urlNes) =>
+      assertEquals(
+        parse(s"[$textNes]($urlNes)", linkParser).map(generateHtml).map(_.render),
+        Right(s"""<a href="$urlNes">$textNes</a>""")
+      )
+    }
   }
 }
