@@ -23,10 +23,10 @@ This is a simple static site generator written in Scala. It takes markdown files
 | Bold            | `**bold text**`          | `<strong>bold text</strong>`  |
 | Italic          | `*italic text*`          | `<em>italic text</em>`        |
 | Links           | `[link text](url)`       | `<a href="url">link text</a>` |
-| Underlined      | `__underlined text__`     | `<u>underlined text</u>`      |
+| Underlined      | `__underlined text__`    | `<u>underlined text</u>`      |
 | Paragraphs      | separated by blank lines | `<p>paragraph text</p>`       |
 | Unordered lists | `- item`                 | `<ul><li>item</li></ul>`      | 
-| Ordered lists   |  `1. item`               | `<ol><li>item</li></ol>`      | 
+| Ordered lists   | `1. item`                | `<ol><li>item</li></ol>`      | 
 
 
 ### Future stretch goals

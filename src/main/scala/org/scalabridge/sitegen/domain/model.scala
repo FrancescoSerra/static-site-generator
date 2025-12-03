@@ -1,35 +1,68 @@
 package org.scalabridge.sitegen.domain
 
-import eu.timepit.refined.types.all.NonEmptyString
+import eu.timepit.refined.api.Refined
+import eu.timepit.refined.string.Url
+import eu.timepit.refined.types.all.*
+import eu.timepit.refined.auto.*
+import eu.timepit.refined.api.*
+import org.scalabridge.sitegen.effects.AsHtml
 
 object model {
+
+  type URLString = String Refined Url
+  object URLString extends RefinedTypeOps[URLString, String]
 
   // AST definitions
   sealed trait AST
   final case class H1(value: NonEmptyString) extends AST
-  final case class H2(value: NonEmptyString) extends AST
-  final case class H3(value: NonEmptyString) extends AST
-  final case class Bold(value: NonEmptyString) extends AST
-  final case class Italic(value: NonEmptyString) extends AST
-  final case class Link(text: NonEmptyString, url: NonEmptyString) extends AST
-  final case class Underlined(value: NonEmptyString) extends AST
-  final case class Paragraph(value: NonEmptyString) extends AST
-  final case class UnorderedListItem(value: NonEmptyString) extends AST
-  final case class OrderedListItem(value: NonEmptyString) extends AST
+  object H1:
+    given AsHtml[H1] with
+      def asHtml(a: H1): HTML = H1Html(a.value)
 
-  // naive weak and brittle smart constructor
-  def mkNode(value: NonEmptyString, typ: String): AST = typ match {
-    case "h1"     => H1(value)
-    case "h2"     => H2(value)
-    case "h3"     => H3(value)
-    case "strong" => Bold(value)
-    case "em"     => Italic(value)
-    case "a"      => Link(value, value)
-    case "u"      => Underlined(value)
-    case "p"      => Paragraph(value)
-    case "ul-li"  => UnorderedListItem(value)
-    case "ol-li"  => OrderedListItem(value)
-  }
+  final case class H2(value: NonEmptyString) extends AST
+  object H2:
+    given AsHtml[H2] with
+      def asHtml(a: H2): HTML = H2Html(a.value)
+
+  final case class H3(value: NonEmptyString) extends AST
+  object H3:
+    given AsHtml[H3] with
+      def asHtml(a: H3): HTML = H3Html(a.value)
+
+  final case class Bold(value: NonEmptyString) extends AST
+  object Bold:
+    given AsHtml[Bold] with
+      def asHtml(a: Bold): HTML = BoldHtml(a.value)
+
+  final case class Italic(value: NonEmptyString) extends AST
+  object Italic:
+    given AsHtml[Italic] with
+      def asHtml(a: Italic): HTML = ItalicHtml(a.value)
+
+  final case class Link(text: NonEmptyString, url: URLString) extends AST
+  object Link:
+    given AsHtml[Link] with
+      def asHtml(a: Link): HTML = LinkHtml(a.text, a.url)
+
+  final case class Underlined(value: NonEmptyString) extends AST
+  object Underlined:
+    given AsHtml[Underlined] with
+      def asHtml(a: Underlined): HTML = UnderlinedHtml(a.value)
+
+  final case class Paragraph(value: NonEmptyString) extends AST
+  object Paragraph:
+    given AsHtml[Paragraph] with
+      def asHtml(a: Paragraph): HTML = ParagraphHtml(a.value)
+
+  final case class UnorderedListItem(value: NonEmptyString) extends AST
+  object UnorderedListItem:
+    given AsHtml[UnorderedListItem] with
+      def asHtml(a: UnorderedListItem): HTML = UnorderedListItemHtml(a.value)
+
+  final case class OrderedListItem(value: NonEmptyString) extends AST
+  object OrderedListItem:
+    given AsHtml[OrderedListItem] with
+      def asHtml(a: OrderedListItem): HTML = OrderedListItemHtml(a.value)
 
   // HTML definitions
   sealed trait HTML {
@@ -50,7 +83,7 @@ object model {
   final case class ItalicHtml(value: NonEmptyString) extends HTML {
     override def render: String = s"<em>$value</em>"
   }
-  final case class LinkHtml(text: NonEmptyString, url: NonEmptyString) extends HTML {
+  final case class LinkHtml(text: NonEmptyString, url: URLString) extends HTML {
     override def render: String = s"""<a href="$url">$text</a>"""
   }
   final case class UnderlinedHtml(value: NonEmptyString) extends HTML {
@@ -65,19 +98,4 @@ object model {
   final case class OrderedListItemHtml(value: NonEmptyString) extends HTML {
     override def render: String = s"<ol><li>$value</li></ol>"
   }
-
-  // naive, weak and brittle smart constructor
-  def mkHtml(value: NonEmptyString, typ: String): HTML = typ match {
-    case "h1"     => H1Html(value)
-    case "h2"     => H2Html(value)
-    case "h3"     => H3Html(value)
-    case "strong" => BoldHtml(value)
-    case "em"     => ItalicHtml(value)
-    case "a"      => LinkHtml(value, value)
-    case "u"      => UnderlinedHtml(value)
-    case "p"      => ParagraphHtml(value)
-    case "ul-li"  => UnorderedListItemHtml(value)
-    case "ol-li"  => OrderedListItemHtml(value)
-  }
-
 }

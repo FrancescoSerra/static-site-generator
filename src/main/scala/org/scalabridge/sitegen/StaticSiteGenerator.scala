@@ -1,12 +1,14 @@
 package org.scalabridge.sitegen
 
-import cats.syntax.all._
+import cats.syntax.all.*
 import eu.timepit.refined.types.string.NonEmptyString
-import org.scalabridge._
-import org.scalabridge.sitegen.domain.model._
+import org.scalabridge.*
+import org.scalabridge.sitegen.domain.model.*
+import org.scalabridge.sitegen.effects.AsHtml
+import org.scalabridge.sitegen.effects.syntax.*
 import parsley.Parsley.many
-import parsley._
-import parsley.character._
+import parsley.*
+import parsley.character.*
 import parsley.combinator.manyTill
 
 object StaticSiteGenerator {
@@ -40,25 +42,14 @@ object StaticSiteGenerator {
       case Right(v) => Parsley.pure(v)
       case _        => Parsley.empty
     }
-    urlValue <- NonEmptyString.from(url.mkString) match {
+    urlValue <- URLString.from(url.mkString) match {
       case Right(v) => Parsley.pure(v)
       case _        => Parsley.empty
     }
   } yield Link(text = textValue, url = urlValue)
 
-  def parse(markdown: String, parsleyInstance: Parsley[AST]): Either[Error, AST] =
+  def parse[A <: AST](markdown: String, parsleyInstance: Parsley[A]): Either[Error, A] =
     parsleyInstance.parse(markdown).toEither.leftMap(Error.apply)
 
-  def generateHtml(tree: AST): HTML = tree match {
-    case H1(title)                => mkHtml(title, "h1")
-    case H2(value)                => mkHtml(value, "h2")
-    case H3(value)                => mkHtml(value, "h3")
-    case Bold(value)              => mkHtml(value, "strong")
-    case Italic(value)            => mkHtml(value, "em")
-    case Link(text, url)          => LinkHtml(text = text, url = url)
-    case Underlined(value)        => mkHtml(value, "u")
-    case Paragraph(value)         => mkHtml(value, "p")
-    case UnorderedListItem(value) => mkHtml(value, "ul-li")
-    case OrderedListItem(value)   => mkHtml(value, "ol-li")
-  }
+  def generateHtml[A <: AST: AsHtml](tree: A): HTML = tree.asHtml
 }
