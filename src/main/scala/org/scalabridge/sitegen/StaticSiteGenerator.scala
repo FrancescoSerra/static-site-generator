@@ -28,6 +28,14 @@ object StaticSiteGenerator {
     }
   } yield Underlined(value)
 
+  val paragraphParser: Parsley[Paragraph] = for {
+    in <- many(satisfy(_ != '\n')) <~ newline <~ newline
+    value <- NonEmptyString.from(in.mkString) match {
+      case Right(v) => Parsley.pure(v)
+      case _        => Parsley.empty
+    }
+  } yield Paragraph(value)
+
   private val notSquareBracket: Parsley[List[Char]] = many(satisfy(_ != ']'))
   private val notRoundBracket: Parsley[List[Char]] = many(satisfy(_ != ')'))
   private val linkTextParser: Parsley[String] =

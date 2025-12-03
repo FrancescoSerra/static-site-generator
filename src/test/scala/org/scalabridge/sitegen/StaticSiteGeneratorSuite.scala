@@ -64,3 +64,13 @@ class StaticSiteGeneratorSuite extends ScalaCheckSuite {
     )
   }
 }
+
+  test("Paragraph") {
+    forAll(nonEmptyStringGen) { nes =>
+      assertEquals(
+        parse(s"$nes\n\n", paragraphParser).map(generateHtml).map(_.render),
+        Right(s"<p>$nes</p>")
+      )
+    }
+  }
+}

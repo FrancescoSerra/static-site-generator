@@ -1,11 +1,12 @@
 package org.scalabridge.sitegen.domain
 
 import eu.timepit.refined.types.all.NonEmptyString
+import parsley.Parsley
 
 object model {
 
   // AST definitions
-  sealed trait AST
+  sealed trait AST 
   final case class H1(value: NonEmptyString) extends AST
   final case class H2(value: NonEmptyString) extends AST
   final case class H3(value: NonEmptyString) extends AST
