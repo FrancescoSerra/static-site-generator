@@ -1,7 +1,13 @@
 package org.scalabridge.sitegen
 
 import munit.ScalaCheckSuite
-import org.scalabridge.sitegen.StaticSiteGenerator.{generateHtml, h1Parser, parse, underLinedParser}
+import org.scalabridge.sitegen.StaticSiteGenerator.{
+  generateHtml,
+  h1Parser,
+  linkParser,
+  parse,
+  underLinedParser
+}
 import org.scalabridge.sitegen.generators.misc.nonEmptyStringGen
 import org.scalacheck.Prop.forAll
 
@@ -21,6 +27,15 @@ class StaticSiteGeneratorSuite extends ScalaCheckSuite {
       assertEquals(
         parse(s"__${nes}__\n", underLinedParser).map(generateHtml).map(_.render),
         Right(s"<u>$nes</u>")
+      )
+    }
+  }
+
+  test("Link") {
+    forAll(nonEmptyStringGen, nonEmptyStringGen) { (textNes, urlNes) =>
+      assertEquals(
+        parse(s"[$textNes]($urlNes)", linkParser).map(generateHtml).map(_.render),
+        Right(s"""<a href="$urlNes">$textNes</a>""")
       )
     }
   }
