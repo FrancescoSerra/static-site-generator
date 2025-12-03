@@ -1,14 +1,7 @@
 package org.scalabridge.sitegen
 
 import munit.ScalaCheckSuite
-import org.scalabridge.sitegen.StaticSiteGenerator.{
-  generateHtml,
-  h1Parser,
-  linkParser,
-  parse,
-  parseMany,
-  underLinedParser
-}
+import org.scalabridge.sitegen.StaticSiteGenerator.{generateHtml, h1Parser, linkParser, paragraphParser, parse, parseMany, underLinedParser}
 import org.scalabridge.sitegen.generators.misc.nonEmptyStringGen
 import org.scalacheck.Prop.forAll
 
@@ -46,8 +39,7 @@ class StaticSiteGeneratorSuite extends ScalaCheckSuite {
       parseMany(
         """# A title
           |Some __underlined text__. Refer [an example link](http://www.example.com).
-          |
-          |More text.
+          |More text
           |
           |# Another title
           |Another text""".stripMargin
@@ -63,7 +55,28 @@ class StaticSiteGeneratorSuite extends ScalaCheckSuite {
       )
     )
   }
-}
+
+  test("Integration test 2") {
+    assertEquals(
+      parseMany(
+        """# A title
+          |Some
+          |
+          |More text.
+          |
+          |# Another title
+          |""".stripMargin
+      ).map(trees => generateHtml(trees).map(_.render)),
+      Right(
+        List(
+          "<h1>A title</h1>",
+          "<p>Some</p>",
+          "<p>More text.</p>",
+          "<h1>Another title</h1>"
+        )
+      )
+    )
+  }
 
   test("Paragraph") {
     forAll(nonEmptyStringGen) { nes =>

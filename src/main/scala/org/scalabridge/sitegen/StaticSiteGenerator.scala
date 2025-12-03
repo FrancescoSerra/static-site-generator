@@ -12,28 +12,24 @@ import parsley.combinator.manyTill
 object StaticSiteGenerator {
   private val ws: Parsley[Unit] = Parsley.many(space).void
 
+  private def stringToParsley(in: String) = NonEmptyString.from(in) match {
+    case Right(v) => Parsley.pure(v)
+    case _        => Parsley.empty
+  }
+
   val h1Parser: Parsley[H1] = for {
     in <- char('#') ~> ws ~> many(satisfy(_ != '\n')) <~ newline
-    value <- NonEmptyString.from(in.mkString) match {
-      case Right(v) => Parsley.pure(v)
-      case _        => Parsley.empty
-    }
+    value <- stringToParsley(in.mkString)
   } yield H1(value)
 
   val underLinedParser: Parsley[Underlined] = for {
     in <- string("__") ~> manyTill(item, string("__")) <~ newline
-    value <- NonEmptyString.from(in.mkString) match {
-      case Right(v) => Parsley.pure(v)
-      case _        => Parsley.empty
-    }
+    value <- stringToParsley(in.mkString)
   } yield Underlined(value)
 
   val paragraphParser: Parsley[Paragraph] = for {
     in <- many(satisfy(_ != '\n')) <~ newline <~ newline
-    value <- NonEmptyString.from(in.mkString) match {
-      case Right(v) => Parsley.pure(v)
-      case _        => Parsley.empty
-    }
+    value <- stringToParsley(in.mkString)
   } yield Paragraph(value)
 
   private val notSquareBracket: Parsley[List[Char]] = many(satisfy(_ != ']'))
@@ -44,17 +40,11 @@ object StaticSiteGenerator {
     (char('(') ~> notRoundBracket <~ char(')')).map(_.mkString)
   val linkParser: Parsley[Link] = for {
     (text, url) <- linkTextParser <~> linkUrlParser
-    textValue <- NonEmptyString.from(text.mkString) match {
-      case Right(v) => Parsley.pure(v)
-      case _        => Parsley.empty
-    }
-    urlValue <- NonEmptyString.from(url.mkString) match {
-      case Right(v) => Parsley.pure(v)
-      case _        => Parsley.empty
-    }
-  } yield Link(text = textValue, url = urlValue)
+    textValue <- stringToParsley(text)
+    urlValue <- stringToParsley(url)
+  } yield Link(textValue, urlValue)
 
-  private val astParser: Parsley[AST] = atomic(atomic(h1Parser) <|> underLinedParser) <|> linkParser
+  private val astParser: Parsley[AST] = atomic(atomic(atomic(h1Parser) <|> underLinedParser) <|> linkParser) <|> paragraphParser
   private val astListParser: Parsley[List[AST]] = many(astParser)
 
   def parse(markdown: String, parsleyInstance: Parsley[AST]): Either[Error, AST] =
@@ -69,7 +59,7 @@ object StaticSiteGenerator {
     case H3(value)                => mkHtml(value, "h3")
     case Bold(value)              => mkHtml(value, "strong")
     case Italic(value)            => mkHtml(value, "em")
-    case Link(text, url)          => LinkHtml(text = text, url = url)
+    case Link(text, url)          => LinkHtml(text, url)
     case Underlined(value)        => mkHtml(value, "u")
     case Paragraph(value)         => mkHtml(value, "p")
     case UnorderedListItem(value) => mkHtml(value, "ul-li")
