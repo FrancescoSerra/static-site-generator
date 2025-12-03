@@ -52,13 +52,15 @@ class StaticSiteGeneratorSuite extends ScalaCheckSuite {
           |# Another title
           |Another text""".stripMargin
       ).map(trees => generateHtml(trees).map(_.render)),
-      Right(List(
-        "<h1>A title</h1>",
-        """Some <u>underlined text</u>. <p>Refer <a href="http://www.example.com">an example link</a>.</p>""",
-        "<p>More text.</p>",
-        "<h1>Another title</h1>",
-        "<p>Another text.</p>",
-      ))
+      Right(
+        List(
+          "<h1>A title</h1>",
+          """Some <u>underlined text</u>. <p>Refer <a href="http://www.example.com">an example link</a>.</p>""",
+          "<p>More text.</p>",
+          "<h1>Another title</h1>",
+          "<p>Another text.</p>"
+        )
+      )
     )
   }
 }
